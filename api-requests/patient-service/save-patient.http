@@ -1,0 +1,11 @@
+POST http://localhost:4000/patients
+Content-Type: application/json
+
+{
+  "name": "John",
+  "dateOfBirth": "01-01-1990",
+  "email": "johnab@example.com",
+  "address": "123 Main St, Anytown, USA",
+  "registeredDate": "01-01-2023",
+  "phone": "555-123-4567"
+}
