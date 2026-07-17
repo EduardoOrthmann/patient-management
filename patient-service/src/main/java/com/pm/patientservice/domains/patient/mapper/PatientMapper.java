@@ -14,6 +14,7 @@ import org.mapstruct.MappingTarget;
 public interface PatientMapper {
     PatientResponseDTO toDTO(Patient patient);
 
+    @Mapping(target = "registeredDate", ignore = true)
     @Mapping(target = "id", ignore = true)
     Patient toEntity(PatientCreateDTO dto);
 
