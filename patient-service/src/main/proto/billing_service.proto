@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package pm.billing.v1;
+
+option java_multiple_files = true;
+option java_package = "com.pm.billing.v1";
+
+service BillingService {
+  rpc CreateBillingAccount(CreateBillingAccountRequest) returns (CreateBillingAccountResponse);
+}
+
+message CreateBillingAccountRequest {
+  string patient_id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message CreateBillingAccountResponse {
+  string account_id = 1;
+  BillingStatus status = 2;
+}
+
+enum BillingStatus {
+  BILLING_STATUS_UNSPECIFIED = 0;
+  BILLING_STATUS_SUCCESS = 1;
+  BILLING_STATUS_PENDING = 2;
+  BILLING_STATUS_FAILED = 3;
+}

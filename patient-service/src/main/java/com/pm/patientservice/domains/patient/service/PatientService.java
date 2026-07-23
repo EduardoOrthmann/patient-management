@@ -1,5 +1,6 @@
 package com.pm.patientservice.domains.patient.service;
 
+import com.pm.patientservice.domains.grpc.BillingServiceGrpcClient;
 import com.pm.patientservice.domains.patient.dto.PatientCreateDTO;
 import com.pm.patientservice.domains.patient.dto.PatientReplaceDTO;
 import com.pm.patientservice.domains.patient.dto.PatientResponseDTO;
@@ -11,6 +12,7 @@ import com.pm.patientservice.exception.custom.PatientNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.pm.patientservice.domains.patient.mapper.PatientMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,8 +20,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PatientService {
+
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
 
     public List<PatientResponseDTO> findAll() {
         return patientRepository.findAll().stream().map(patientMapper::toDTO).toList();
@@ -31,12 +35,15 @@ public class PatientService {
                 .orElseThrow(() -> new PatientNotFoundException(id));
     }
 
+    @Transactional
     public PatientResponseDTO save(PatientCreateDTO patientCreateDTO) {
         if (patientRepository.existsByEmail(patientCreateDTO.getEmail())) {
             throw new EmailAlreadyExistsException(patientCreateDTO.getEmail());
         }
 
         Patient newPatient = patientRepository.save(patientMapper.toEntity(patientCreateDTO));
+        billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(), newPatient.getEmail());
+
         return patientMapper.toDTO(newPatient);
     }
 

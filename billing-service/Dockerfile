@@ -12,8 +12,9 @@ WORKDIR /app
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
-COPY --from=build /app/target/patient-service-*.jar patient-service.jar
+COPY --from=build /app/target/billing-service-*.jar billing-service.jar
 
-EXPOSE 4000
+EXPOSE 4001
+EXPOSE 9001
 
-ENTRYPOINT ["java", "-jar", "patient-service.jar"]
+ENTRYPOINT ["java", "-jar", "billing-service.jar"]

@@ -73,6 +73,12 @@
             <artifactId>spring-boot-h2console</artifactId>
         </dependency>
 
+        <!-- gRPC -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-grpc-server</artifactId>
+        </dependency>
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -126,6 +132,12 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+
+            <!-- Protobuf -->
+            <plugin>
+                <groupId>io.github.ascopes</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
             </plugin>
 
             <!-- Compiler Plugin -->
