@@ -1,14 +1,12 @@
 package com.pm.billingservice.billing;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
 public class BillingAccountService {
-    private static final Logger log = LoggerFactory.getLogger(BillingAccountService.class);
+
     private final BillingAccountRepository billingAccountRepository;
 
     public BillingAccountService(BillingAccountRepository billingAccountRepository) {
@@ -20,8 +18,6 @@ public class BillingAccountService {
 
         String id = UUID.randomUUID().toString();
         BillingAccount account = new BillingAccount(id, patientId, name, email);
-
-        log.info("Created billing account with ID: {}", id);
 
         return billingAccountRepository.save(account);
     }
