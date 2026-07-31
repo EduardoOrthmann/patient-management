@@ -45,6 +45,13 @@
             <artifactId>spring-boot-starter-aspectj</artifactId>
         </dependency>
 
+        <!-- Centralized gRPC Protos -->
+        <dependency>
+            <groupId>com.pm</groupId>
+            <artifactId>grpc-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- gRPC -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -80,12 +87,6 @@
                         </exclude>
                     </excludes>
                 </configuration>
-            </plugin>
-
-            <!-- Protobuf -->
-            <plugin>
-                <groupId>io.github.ascopes</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
             </plugin>
 
             <!-- Compiler Plugin -->
