@@ -1,9 +1,6 @@
 package com.pm.patientservice.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.context.annotation.Bean;
@@ -19,11 +16,19 @@ public class RabbitMQTopologyConfig {
     public static final String ROUTING_KEY_PATIENT_CREATED = "patient.created";
     public static final String ROUTING_KEY_PATIENT_WILDCARD = "patient.*";
 
+    public static final String DLX = "patient.dlx";
+    public static final String DLQ = "patient.dlq";
+
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
         RabbitAdmin admin = new RabbitAdmin(connectionFactory);
         admin.setAutoStartup(true);
         return admin;
+    }
+
+    @Bean
+    public TopicExchange deadLetterExchange() {
+        return new TopicExchange(DLX);
     }
 
     @Bean
@@ -35,12 +40,30 @@ public class RabbitMQTopologyConfig {
     @Bean
     public Queue analyticsQueue() {
         // (name, durable) - Survives broker restarts
-        return new Queue(QUEUE_ANALYTICS, true);
+        return QueueBuilder.durable(QUEUE_ANALYTICS)
+                .withArgument("x-dead-letter-exchange", DLX)
+                .withArgument("x-dead-letter-routing-key", "failed.analytics")
+                .build();
     }
 
     @Bean
     public Queue auditQueue() {
-        return new Queue(QUEUE_AUDIT, true);
+        return QueueBuilder.durable(QUEUE_AUDIT)
+                .withArgument("x-dead-letter-exchange", DLX)
+                .withArgument("x-dead-letter-routing-key", "failed.audit")
+                .build();
+    }
+
+    @Bean
+    public Queue deadLetterQueue() {
+        return new Queue(DLQ, true);
+    }
+
+    @Bean
+    public Binding deadLetterBinding() {
+        return BindingBuilder.bind(deadLetterQueue())
+                .to(deadLetterExchange())
+                .with("#");
     }
 
     @Bean

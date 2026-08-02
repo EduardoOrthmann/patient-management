@@ -16,7 +16,11 @@ public class PatientEventPublisher {
         rabbitTemplate.convertAndSend(
                 RabbitMQTopologyConfig.EXCHANGE_PATIENT_EVENTS,
                 RabbitMQTopologyConfig.ROUTING_KEY_PATIENT_CREATED,
-                patient
+                patient,
+                message -> {
+                    message.getMessageProperties().setHeader("__TypeId__", "patientCreated");
+                    return message;
+                }
         );
     }
 }
