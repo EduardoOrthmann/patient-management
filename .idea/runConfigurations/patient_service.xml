@@ -35,6 +35,14 @@
               <option name="name" value="SPRING_SQL_INIT_MODE" />
               <option name="value" value="always" />
             </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="RABBITMQ_USERNAME" />
+              <option name="value" value="admin" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="RABBITMQ_PASSWORD" />
+              <option name="value" value="admin" />
+            </DockerEnvVarImpl>
           </list>
         </option>
         <option name="portBindings">

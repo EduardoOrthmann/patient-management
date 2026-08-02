@@ -5,6 +5,7 @@ import com.pm.patientservice.domains.patient.dto.PatientCreateDTO;
 import com.pm.patientservice.domains.patient.dto.PatientReplaceDTO;
 import com.pm.patientservice.domains.patient.dto.PatientResponseDTO;
 import com.pm.patientservice.domains.patient.dto.PatientUpdateDTO;
+import com.pm.patientservice.domains.patient.messaging.PatientEventPublisher;
 import com.pm.patientservice.domains.patient.model.Patient;
 import com.pm.patientservice.domains.patient.repository.PatientRepository;
 import com.pm.patientservice.exception.custom.EmailAlreadyExistsException;
@@ -24,6 +25,7 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
     private final BillingServiceGrpcClient billingServiceGrpcClient;
+    private final PatientEventPublisher  patientEventPublisher;
 
     public List<PatientResponseDTO> findAll() {
         return patientRepository.findAll().stream().map(patientMapper::toDTO).toList();
@@ -44,9 +46,14 @@ public class PatientService {
         Patient newPatient = patientRepository.save(patientMapper.toEntity(patientCreateDTO));
         billingServiceGrpcClient.createBillingAccount(newPatient.getId().toString(), newPatient.getName(), newPatient.getEmail());
 
-        return patientMapper.toDTO(newPatient);
+        var patientResponseDTO = patientMapper.toDTO(newPatient);
+
+        patientEventPublisher.publishPatientCreatedEvent(patientResponseDTO);
+
+        return patientResponseDTO;
     }
 
+    @Transactional
     public PatientResponseDTO replace(UUID id, PatientReplaceDTO patientReplaceDTO) {
         Patient patient = getPatientOrThrow(id);
         validateEmailChange(patient.getEmail(), patientReplaceDTO.getEmail());
@@ -56,6 +63,7 @@ public class PatientService {
         return patientMapper.toDTO(patientRepository.save(patient));
     }
 
+    @Transactional
     public PatientResponseDTO update(UUID id, PatientUpdateDTO patientUpdateDTO) {
         Patient patient = getPatientOrThrow(id);
         validateEmailChange(patient.getEmail(), patientUpdateDTO.getEmail());
